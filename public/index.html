@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aritz · Planner</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+  --bg: #080a0f;
+  --s1: #0f1118;
+  --s2: #161b26;
+  --s3: #1e2535;
+  --border: #252d40;
+  --border2: #2e3a52;
+  --blue: #4a8cf7;
+  --purple: #8b5cf6;
+  --green: #10d9a0;
+  --yellow: #f5a623;
+  --red: #f04848;
+  --text: #dde3f0;
+  --muted: #5a6480;
+  --muted2: #8391b0;
+  --sans: 'Space Grotesk', sans-serif;
+  --mono: 'Space Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* NAV */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--s1);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.brand {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--blue);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.clock {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted2);
+}
+
+/* BOTTOM TABS */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--s1);
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 50;
+}
+
+.bnav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 4px 12px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.bnav-btn .icon { font-size: 20px; line-height: 1; }
+.bnav-btn.active { color: var(--blue); }
+
+/* CONTENT */
+.content { padding: 20px 16px; max-width: 480px; margin: 0 auto; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* SECTION HEADER */
+.sec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.sec-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted2);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* HERO DAY */
+.hero {
+  background: linear-gradient(135deg, var(--s2) 0%, #0f1a2e 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px 20px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(74,140,247,0.12) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.hero-greeting {
+  font-size: 13px;
+  color: var(--muted2);
+  margin-bottom: 6px;
+}
+
+.hero-title {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.hero-date {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 20px;
+}
+
+.hero-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--purple));
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.progress-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted2);
+  white-space: nowrap;
+}
+
+/* QUICK STATS */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 10px;
+  text-align: center;
+}
+
+.stat-num {
+  font-family: var(--mono);
+  font-size: 24px;
+  font-weight: 700;
+  display: block;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-lbl {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* CARD */
+.card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 14px;
+}
+
+/* TASKS */
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+}
+.task-row:last-child { border-bottom: none; }
+
+.check-box {
+  width: 22px; height: 22px;
+  border-radius: 7px;
+  border: 2px solid var(--border2);
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  font-size: 12px;
+  font-weight: 700;
+  color: transparent;
+}
+
+.check-box.done {
+  background: var(--green);
+  border-color: var(--green);
+  color: #000;
+}
+
+.task-label {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.task-label.done { color: var(--muted); text-decoration: line-through; }
+
+.del-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.del-btn:hover { color: var(--red); }
+
+/* ADD ROW */
+.add-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.inp {
+  flex: 1;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.inp:focus { border-color: var(--blue); }
+.inp::placeholder { color: var(--muted); }
+
+.btn {
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.btn:hover { opacity: 0.85; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-ghost {
+  background: var(--s2);
+  color: var(--muted2);
+  border: 1px solid var(--border);
+}
+
+.btn-sm { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
+.btn-purple { background: var(--purple); }
+.btn-green { background: var(--green); color: #000; }
+
+/* WEEK GRID */
+.week-list { display: flex; flex-direction: column; gap: 8px; }
+
+.day-item {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.day-item.today { border-color: var(--blue); }
+
+.day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.day-name-row { display: flex; align-items: center; gap: 10px; }
+
+.day-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border2);
+  flex-shrink: 0;
+}
+
+.day-item.today .day-dot { background: var(--green); }
+
+.day-nm {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.today-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  background: var(--blue);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.day-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.day-body {
+  padding: 0 16px 14px;
+  display: none;
+}
+
+.day-body.open { display: block; }
+
+.day-task-list { list-style: none; margin-bottom: 10px; }
+
+.day-task-list li {
+  font-size: 13px;
+  color: var(--muted2);
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.day-task-list li::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+
+/* TRACKER */
+.tracker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.tracker-field {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.tracker-field.full { grid-column: 1 / -1; }
+
+.tf-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toggle-group {
+  display: flex;
+  gap: 6px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 8px 4px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.toggle-btn.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+  font-weight: 600;
+}
+
+.num-inp {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+  width: 100%;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+.num-inp:focus { border-color: var(--blue); }
+
+/* STATS CHARTS */
+.chart-wrap {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 14px;
+}
+
+.chart-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--muted2);
+}
+
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 80px;
+}
+
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.bar-fill {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: height 0.4s ease;
+}
+
+.bar-lbl {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.metric-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.metric-row:last-child { border-bottom: none; }
+
+.metric-name { font-size: 13px; color: var(--muted2); }
+.metric-val {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #f59e0b22, #f59e0b11);
+  border: 1px solid #f59e0b44;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: var(--yellow);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* PENDING */
+.pending-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.pending-row:last-child { border-bottom: none; }
+
+.prio-pill {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.prio-high { background: #f0484822; color: var(--red); }
+.prio-med  { background: #f5a62322; color: var(--yellow); }
+.prio-low  { background: #10d9a022; color: var(--green); }
+
+.pending-text { flex: 1; font-size: 14px; line-height: 1.4; }
+
+/* AI PANEL */
+.ai-box {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.ai-messages {
+  min-height: 220px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.msg {
+  max-width: 90%;
+  padding: 12px 15px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.msg-ai {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.msg-user {
+  background: var(--blue);
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.ai-bar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--s2);
+}
+
+.quick-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+/* SPINNERS */
+.spin {
+  display: inline-block;
+  width: 12px; height: 12px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 6px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--s3);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  opacity: 0;
+  transition: all 0.25s;
+  z-index: 200;
+  white-space: nowrap;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* EMPTY */
+.empty { text-align: center; color: var(--muted); font-size: 13px; padding: 28px 0; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">⚡ aritz.plan</span>
+  <span class="clock" id="clock">--:--</span>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- PANELS -->
+<div class="content">
+
+  <!-- HOY -->
+  <div class="panel active" id="p-hoy">
+    <div class="hero">
+      <div class="hero-greeting" id="greeting">Cargando...</div>
+      <div class="hero-title" id="heroDay">—</div>
+      <div class="hero-date" id="heroDate">—</div>
+      <div class="hero-progress">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <span class="progress-label" id="progressLabel">0 / 0</span>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-num" id="sDone" style="color:var(--green)">0</span>
+        <span class="stat-lbl">Hechas</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="sPending" style="color:var(--yellow)">0</span>
+        <span class="stat-lbl">Pendientes</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" id="sStreak" style="color:var(--purple)">0</span>
+        <span class="stat-lbl">Racha 🔥</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec-head">
+        <span class="sec-title">Plan de hoy</span>
+        <button class="btn btn-ghost btn-sm" onclick="resetFromRoutine()">↺ Rutina</button>
+      </div>
+      <div id="todayList"><div class="empty">Cargando...</div></div>
+      <div class="add-row">
+        <input class="inp" id="newToday" placeholder="Añadir tarea..." onkeydown="if(event.key==='Enter')addToday()">
+        <button class="btn" onclick="addToday()">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEMANA -->
+  <div class="panel" id="p-semana">
+    <div class="sec-head" style="margin-bottom:16px">
+      <span class="sec-title">Esta semana</span>
+    </div>
+    <div class="week-list" id="weekList"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="panel" id="p-stats">
+    <!-- Daily tracker -->
+    <div class="card">
+      <div class="sec-head">
+        <span class="sec-title">Registrar hoy</span>
+        <button class="btn btn-green btn-sm" id="saveTrackerBtn" onclick="saveTracker()">Guardar</button>
+      </div>
+
+      <div class="tracker-grid">
+        <div class="tracker-field">
+          <div class="tf-label">🥊 Entrenamiento</div>
+          <div class="toggle-group">
+            <button class="toggle-btn" id="tYes" onclick="setTraining(true)">Sí</button>
+            <button class="toggle-btn" id="tNo" onclick="setTraining(false)">No</button>
+          </div>
+        </div>
+        <div class="tracker-field">
+          <div class="tf-label">🥗 Nutrición</div>
+          <div class="toggle-group">
+            <button class="toggle-btn" id="nYes" onclick="setNutrition(true)">Sí</button>
+            <button class="toggle-btn" id="nNo" onclick="setNutrition(false)">No</button>
+          </div>
+        </div>
+        <div class="tracker-field">
+          <div class="tf-label">📚 Horas estudio</div>
+          <input class="num-inp" id="studyH" type="number" min="0" max="12" step="0.5" placeholder="0">
+        </div>
+        <div class="tracker-field">
+          <div class="tf-label">😴 Horas sueño</div>
+          <input class="num-inp" id="sleepH" type="number" min="0" max="12" step="0.5" placeholder="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats charts -->
+    <div class="chart-wrap">
+      <div class="chart-title">Entrenamientos — últimos 7 días</div>
+      <div class="bar-chart" id="trainChart"></div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Horas de estudio — últimos 7 días</div>
+      <div class="bar-chart" id="studyChart"></div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Resumen semanal</div>
+      <div id="summaryMetrics"><div class="empty">Sin datos aún</div></div>
+    </div>
+  </div>
+
+  <!-- PENDIENTES -->
+  <div class="panel" id="p-pendientes">
+    <div class="card">
+      <div class="sec-head">
+        <span class="sec-title">Tareas a largo plazo</span>
+      </div>
+      <div id="pendingList"><div class="empty">Sin tareas pendientes ✓</div></div>
+      <div class="add-row">
+        <input class="inp" id="newPending" placeholder="Nueva tarea..." onkeydown="if(event.key==='Enter')addPending()">
+        <button class="btn" onclick="addPending()">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IA -->
+  <div class="panel" id="p-ia">
+    <div class="quick-btns">
+      <button class="btn btn-ghost btn-sm" onclick="quickAsk('¿Qué debería priorizar hoy?')">🎯 Prioridad de hoy</button>
+      <button class="btn btn-ghost btn-sm" onclick="quickAsk('Analiza mi semana y dame recomendaciones')">📊 Analiza mi semana</button>
+      <button class="btn btn-ghost btn-sm" onclick="quickAsk('¿Cómo puedo mejorar mi rendimiento en artes marciales esta semana?')">🥊 Mejorar entrenos</button>
+      <button class="btn btn-ghost btn-sm" onclick="quickAsk('¿Cuándo encajo las tareas pendientes esta semana?')">📋 Planificar tareas</button>
+      <button class="btn btn-ghost btn-sm" onclick="quickAsk('Dame motivación para hoy')">⚡ Motivación</button>
+      <button class="btn btn-ghost btn-sm" onclick="quickAsk('Revisa mis estadísticas y dime en qué área mejorar más')">💡 Área de mejora</button>
+    </div>
+    <div class="ai-box">
+      <div class="ai-messages" id="aiMsgs">
+        <div class="msg msg-ai">👋 Hola Aritz. Tengo acceso a tus rutinas, estadísticas y tareas pendientes. Pregúntame lo que necesites o usa los botones de arriba.</div>
+      </div>
+      <div class="ai-bar">
+        <input class="inp" id="aiInp" placeholder="Escríbeme..." onkeydown="if(event.key==='Enter')sendAI()">
+        <button class="btn" onclick="sendAI()">→</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="bnav-btn active" onclick="goTab('hoy',this)">
+    <span class="icon">📅</span>Hoy
+  </button>
+  <button class="bnav-btn" onclick="goTab('semana',this)">
+    <span class="icon">🗓</span>Semana
+  </button>
+  <button class="bnav-btn" onclick="goTab('stats',this)">
+    <span class="icon">📊</span>Stats
+  </button>
+  <button class="bnav-btn" onclick="goTab('pendientes',this)">
+    <span class="icon">✅</span>Tareas
+  </button>
+  <button class="bnav-btn" onclick="goTab('ia',this)">
+    <span class="icon">🤖</span>IA
+  </button>
+</nav>
+
+<script>
+const API = '/.netlify/functions/planner-api';
+const DAYS_EN = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+const DAYS_ES = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const DAY_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+let state = null;
+let todayDone = {};
+let tracker = { training: null, nutrition: null, studyH: 0, sleepH: 0 };
+
+// ===== INIT =====
+async function init() {
+  tick();
+  setInterval(tick, 1000);
+  await loadData();
+  loadTodayDone();
+  loadTodayTracker();
+  renderAll();
+}
+
+function tick() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+}
+
+async function loadData() {
+  try {
+    const r = await fetch(API);
+    state = r.ok ? await r.json() : defaultData();
+  } catch { state = defaultData(); }
+}
+
+async function save() {
+  try {
+    await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state),
+    });
+  } catch {}
+}
+
+function defaultData() {
+  return {
+    routines: {
+      monday:    ['K1 training 19:00', 'Estudiar TIA Portal'],
+      tuesday:   ['BJJ 19:00'],
+      wednesday: ['K1 training 19:00', 'Estudiar'],
+      thursday:  ['NOGI/Grappling 19:00'],
+      friday:    ['MMA 19:00'],
+      saturday:  ['Descanso activo', 'Conducir / teoría'],
+      sunday:    ['Descanso', 'Planificación semana'],
+    },
+    pendingTasks: ['Repasar encoders y PID', 'Ejercicio Factory I/O', 'Teoría de conducir'],
+    todayPlan: [],
+    history: [],
+  };
+}
+
+// ===== TODAY DONE (localStorage) =====
+function loadTodayDone() {
+  const date = new Date().toDateString();
+  const saved = localStorage.getItem('done');
+  const savedDate = localStorage.getItem('doneDate');
+  todayDone = (savedDate === date && saved) ? JSON.parse(saved) : {};
+  localStorage.setItem('doneDate', date);
+}
+
+function saveTodayDone() {
+  localStorage.setItem('done', JSON.stringify(todayDone));
+}
+
+// ===== TRACKER (localStorage for today) =====
+function loadTodayTracker() {
+  const date = new Date().toISOString().split('T')[0];
+  const saved = localStorage.getItem('tracker_' + date);
+  if (saved) tracker = JSON.parse(saved);
+  // Sync inputs
+  if (tracker.training !== null) setTraining(tracker.training, false);
+  if (tracker.nutrition !== null) setNutrition(tracker.nutrition, false);
+  if (tracker.studyH) document.getElementById('studyH').value = tracker.studyH;
+  if (tracker.sleepH) document.getElementById('sleepH').value = tracker.sleepH;
+}
+
+// ===== RENDER ALL =====
+function renderAll() {
+  renderHero();
+  renderToday();
+  renderWeek();
+  renderStats();
+  renderPending();
+}
+
+// ===== HERO =====
+function renderHero() {
+  const now = new Date();
+  const h = now.getHours();
+  const greeting = h < 13 ? 'Buenos días 🌅' : h < 20 ? 'Buenas tardes ☀️' : 'Buenas noches 🌙';
+  document.getElementById('greeting').textContent = greeting;
+  document.getElementById('heroDay').textContent = DAYS_ES[now.getDay()];
+  document.getElementById('heroDate').textContent =
+    now.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+  updateProgress();
+  updateSmallStats();
+}
+
+function updateProgress() {
+  const tasks = getTodayTasks();
+  const done = Object.values(todayDone).filter(Boolean).length;
+  const total = tasks.length;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `${done} / ${total}`;
+}
+
+function updateSmallStats() {
+  const tasks = getTodayTasks();
+  const done = Object.values(todayDone).filter(Boolean).length;
+  document.getElementById('sDone').textContent = done;
+  document.getElementById('sPending').textContent = (state.pendingTasks || []).length;
+  // Streak: consecutive days with at least 1 training
+  const streak = calcStreak();
+  document.getElementById('sStreak').textContent = streak;
+}
+
+function calcStreak() {
+  const history = (state.history || []).slice().sort((a, b) => b.date.localeCompare(a.date));
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    const entry = history.find(e => e.date === key);
+    if (entry && entry.training) streak++;
+    else if (i > 0) break;
+  }
+  return streak;
+}
+
+// ===== TODAY TASKS =====
+function getTodayTasks() {
+  const key = DAYS_EN[new Date().getDay()];
+  return state.todayPlan.length > 0 ? state.todayPlan : (state.routines[key] || []);
+}
+
+function renderToday() {
+  const tasks = getTodayTasks();
+  const el = document.getElementById('todayList');
+  if (!tasks.length) { el.innerHTML = '<div class="empty">Sin plan. Añade una tarea ↓</div>'; return; }
+  el.innerHTML = tasks.map((t, i) => {
+    const done = todayDone[i] || false;
+    return `<div class="task-row">
+      <div class="check-box ${done ? 'done' : ''}" onclick="toggleDone(${i})">${done ? '✓' : ''}</div>
+      <span class="task-label ${done ? 'done' : ''}">${esc(t)}</span>
+      <button class="del-btn" onclick="removeToday(${i})">×</button>
+    </div>`;
+  }).join('');
+  updateProgress();
+  updateSmallStats();
+}
+
+function toggleDone(i) {
+  todayDone[i] = !todayDone[i];
+  saveTodayDone();
+  renderToday();
+}
+
+function addToday() {
+  const inp = document.getElementById('newToday');
+  const v = inp.value.trim(); if (!v) return;
+  if (!state.todayPlan.length) {
+    const key = DAYS_EN[new Date().getDay()];
+    state.todayPlan = [...(state.routines[key] || [])];
+  }
+  state.todayPlan.push(v);
+  inp.value = '';
+  renderToday(); save();
+}
+
+function removeToday(i) {
+  const key = DAYS_EN[new Date().getDay()];
+  if (!state.todayPlan.length) state.todayPlan = [...(state.routines[key] || [])];
+  state.todayPlan.splice(i, 1);
+  delete todayDone[i];
+  saveTodayDone();
+  renderToday(); save();
+}
+
+function resetFromRoutine() {
+  const key = DAYS_EN[new Date().getDay()];
+  state.todayPlan = [...(state.routines[key] || [])];
+  todayDone = {};
+  saveTodayDone();
+  renderToday(); save();
+  toast('Plan restaurado desde rutina');
+}
+
+// ===== WEEK =====
+function renderWeek() {
+  const todayIdx = new Date().getDay();
+  const el = document.getElementById('weekList');
+  el.innerHTML = DAYS_EN.map((day, i) => {
+    const tasks = state.routines[day] || [];
+    const isToday = i === todayIdx;
+    const taskHtml = tasks.length
+      ? tasks.map(t => `<li>${esc(t)}</li>`).join('')
+      : '<li style="color:var(--muted)">Día libre</li>';
+    return `<div class="day-item ${isToday ? 'today' : ''}">
+      <div class="day-header" onclick="toggleDay(this)">
+        <div class="day-name-row">
+          <div class="day-dot"></div>
+          <span class="day-nm">${DAYS_ES[i]}</span>
+          ${isToday ? '<span class="today-badge">HOY</span>' : ''}
+        </div>
+        <span class="day-count">${tasks.length} tarea${tasks.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="day-body ${isToday ? 'open' : ''}">
+        <ul class="day-task-list">${taskHtml}</ul>
+        <div class="add-row" style="margin-top:0">
+          <input class="inp" placeholder="Añadir a ${DAYS_ES[i]}..." onkeydown="if(event.key==='Enter')addToDay('${day}',this)">
+          <button class="btn btn-sm" onclick="addToDay('${day}',this.previousElementSibling)">+</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDay(header) {
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+function addToDay(dayKey, inp) {
+  const v = inp.value.trim(); if (!v) return;
+  if (!state.routines[dayKey]) state.routines[dayKey] = [];
+  state.routines[dayKey].push(v);
+  inp.value = '';
+  renderWeek(); save();
+  toast('Tarea añadida');
+}
+
+// ===== TRACKER =====
+function setTraining(val, update = true) {
+  tracker.training = val;
+  document.getElementById('tYes').classList.toggle('active', val === true);
+  document.getElementById('tNo').classList.toggle('active', val === false);
+  if (update) saveTrackerLocal();
+}
+
+function setNutrition(val, update = true) {
+  tracker.nutrition = val;
+  document.getElementById('nYes').classList.toggle('active', val === true);
+  document.getElementById('nNo').classList.toggle('active', val === false);
+  if (update) saveTrackerLocal();
+}
+
+function saveTrackerLocal() {
+  tracker.studyH = parseFloat(document.getElementById('studyH').value) || 0;
+  tracker.sleepH = parseFloat(document.getElementById('sleepH').value) || 0;
+  const date = new Date().toISOString().split('T')[0];
+  localStorage.setItem('tracker_' + date, JSON.stringify(tracker));
+}
+
+async function saveTracker() {
+  saveTrackerLocal();
+  const btn = document.getElementById('saveTrackerBtn');
+  btn.disabled = true;
+  btn.textContent = 'Guardando...';
+
+  const entry = {
+    training: tracker.training === true,
+    nutrition: tracker.nutrition === true,
+    studyHours: tracker.studyH,
+    sleepHours: tracker.sleepH,
+    tasksCompleted: Object.values(todayDone).filter(Boolean).length,
+  };
+
+  try {
+    await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'log-day', entry }),
+    });
+    // Refresh state
+    await loadData();
+    renderStats();
+    toast('✅ Día registrado');
+  } catch {
+    toast('⚠️ Error guardando');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Guardar';
+}
+
+// ===== STATS =====
+function renderStats() {
+  renderBarChart('trainChart', 'training', '#10d9a0', 1);
+  renderBarChart('studyChart', 'studyHours', '#4a8cf7', 8);
+  renderSummaryMetrics();
+}
+
+function getLast7Days() {
+  const history = state.history || [];
+  const days = [];
+  const now = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    const entry = history.find(e => e.date === key) || {};
+    days.push({ key, dayIdx: d.getDay(), entry });
+  }
+  return days;
+}
+
+function renderBarChart(containerId, field, color, maxVal) {
+  const days = getLast7Days();
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  const vals = days.map(d => {
+    const v = d.entry[field];
+    if (typeof v === 'boolean') return v ? 1 : 0;
+    return parseFloat(v) || 0;
+  });
+
+  const max = Math.max(...vals, maxVal * 0.3, 0.1);
+
+  el.innerHTML = days.map((d, i) => {
+    const pct = Math.round((vals[i] / max) * 100);
+    return `<div class="bar-col">
+      <div class="bar-fill" style="height:${pct}%;background:${color};opacity:${pct > 0 ? 1 : 0.15}"></div>
+      <span class="bar-lbl">${DAY_SHORT[d.dayIdx]}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderSummaryMetrics() {
+  const days = getLast7Days();
+  const history = days.map(d => d.entry);
+
+  const trainings = history.filter(e => e.training).length;
+  const studyTotal = history.reduce((a, e) => a + (parseFloat(e.studyHours) || 0), 0);
+  const avgSleep = history.filter(e => e.sleepHours > 0).length > 0
+    ? (history.reduce((a, e) => a + (parseFloat(e.sleepHours) || 0), 0) /
+       history.filter(e => e.sleepHours > 0).length).toFixed(1)
+    : '—';
+  const nutritionDays = history.filter(e => e.nutrition).length;
+  const tasksDone = history.reduce((a, e) => a + (parseInt(e.tasksCompleted) || 0), 0);
+
+  const el = document.getElementById('summaryMetrics');
+  if (!days.some(d => Object.keys(d.entry).length > 0)) {
+    el.innerHTML = '<div class="empty">Registra tu primer día en el tracker ↑</div>';
+    return;
+  }
+
+  el.innerHTML = [
+    { name: '🥊 Entrenamientos', val: `${trainings}/7`, color: trainings >= 4 ? 'var(--green)' : 'var(--yellow)' },
+    { name: '📚 Horas de estudio', val: `${studyTotal.toFixed(1)}h`, color: 'var(--blue)' },
+    { name: '😴 Media de sueño', val: `${avgSleep}h`, color: parseFloat(avgSleep) >= 7 ? 'var(--green)' : 'var(--red)' },
+    { name: '🥗 Nutrición correcta', val: `${nutritionDays}/7 días`, color: nutritionDays >= 5 ? 'var(--green)' : 'var(--yellow)' },
+    { name: '✅ Tareas completadas', val: tasksDone, color: 'var(--purple)' },
+  ].map(m => `<div class="metric-row">
+    <span class="metric-name">${m.name}</span>
+    <span class="metric-val" style="color:${m.color}">${m.val}</span>
+  </div>`).join('');
+}
+
+// ===== PENDING =====
+function renderPending() {
+  const tasks = state.pendingTasks || [];
+  const el = document.getElementById('pendingList');
+  if (!tasks.length) { el.innerHTML = '<div class="empty">Sin tareas pendientes ✓</div>'; return; }
+  el.innerHTML = tasks.map((t, i) => {
+    const pill = i === 0 ? ['Alta','prio-high'] : i < 3 ? ['Media','prio-med'] : ['Baja','prio-low'];
+    return `<div class="pending-row">
+      <span class="prio-pill ${pill[1]}">${pill[0]}</span>
+      <span class="pending-text">${esc(t)}</span>
+      <button class="del-btn" onclick="removePending(${i})">×</button>
+    </div>`;
+  }).join('');
+}
+
+function addPending() {
+  const inp = document.getElementById('newPending');
+  const v = inp.value.trim(); if (!v) return;
+  state.pendingTasks.push(v);
+  inp.value = '';
+  renderPending(); save();
+  toast('Tarea añadida');
+}
+
+function removePending(i) {
+  state.pendingTasks.splice(i, 1);
+  renderPending(); save();
+}
+
+// ===== AI =====
+function buildAIContext() {
+  const days = getLast7Days();
+  const history = days.map(d => d.entry);
+  const trainings = history.filter(e => e.training).length;
+  const studyTotal = history.reduce((a, e) => a + (parseFloat(e.studyHours) || 0), 0);
+  const avgSleep = history.filter(e => e.sleepHours > 0).length > 0
+    ? (history.reduce((a, e) => a + (parseFloat(e.sleepHours) || 0), 0) /
+       history.filter(e => e.sleepHours > 0).length).toFixed(1)
+    : 'desconocido';
+  const dayKey = DAYS_EN[new Date().getDay()];
+  const todayPlan = getTodayTasks();
+
+  return `Eres el coach personal y asistente de Aritz Setien (25 años, Eibar).
+Entrena: K1 (Lun/Mié), BJJ (Mar), NOGI/Grappling (Jue), MMA (Vie).
+Estudia: Programación PLC Siemens (TIA Portal / SCL), está en Armeria Eskola.
+También saca el carné de conducir.
+
+ESTADÍSTICAS últimos 7 días:
+- Entrenamientos: ${trainings}/7
+- Horas estudio totales: ${studyTotal.toFixed(1)}h
+- Media sueño: ${avgSleep}h
+- Tareas completadas esta semana: ${history.reduce((a, e) => a + (parseInt(e.tasksCompleted) || 0), 0)}
+
+HOY (${DAYS_ES[new Date().getDay()]}):
+Plan: ${todayPlan.join(', ') || 'sin plan definido'}
+
+TAREAS PENDIENTES:
+${(state.pendingTasks || []).map((t, i) => `${i+1}. ${t}`).join('\n') || 'ninguna'}
+
+Responde en español, de forma directa, concreta y motivadora. Sin florituras.`;
+}
+
+async function sendAI() {
+  const inp = document.getElementById('aiInp');
+  const text = inp.value.trim(); if (!text) return;
+  inp.value = '';
+  appendMsg(text, 'user');
+  await callAI(text);
+}
+
+function quickAsk(text) {
+  goTab('ia', document.querySelectorAll('.bnav-btn')[4]);
+  setTimeout(() => { appendMsg(text, 'user'); callAI(text); }, 50);
+}
+
+function appendMsg(text, role) {
+  const c = document.getElementById('aiMsgs');
+  const d = document.createElement('div');
+  d.className = `msg msg-${role}`;
+  d.textContent = text;
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+  return d;
+}
+
+async function callAI(userMsg) {
+  const c = document.getElementById('aiMsgs');
+  const loading = document.createElement('div');
+  loading.className = 'msg msg-ai';
+  loading.innerHTML = '<span class="spin"></span>Analizando...';
+  c.appendChild(loading);
+  c.scrollTop = c.scrollHeight;
+
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: buildAIContext(),
+        messages: [{ role: 'user', content: userMsg }],
+      }),
+    });
+    const data = await r.json();
+    loading.innerHTML = '';
+    loading.textContent = data.content?.[0]?.text || 'Sin respuesta.';
+  } catch {
+    loading.innerHTML = '';
+    loading.textContent = '⚠️ Error de conexión.';
+  }
+  c.scrollTop = c.scrollHeight;
+}
+
+// ===== NAV =====
+function goTab(name, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('p-' + name).classList.add('active');
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ===== TOAST =====
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// ===== UTILS =====
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+init();
+</script>
+</body>
+</html>

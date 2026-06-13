@@ -1,0 +1,12 @@
+{
+  "name": "daily-planner",
+  "version": "1.0.0",
+  "description": "AI Daily Planner with Telegram bot",
+  "scripts": {
+    "dev": "netlify dev"
+  },
+  "dependencies": {
+    "@netlify/functions": "^2.0.0",
+    "node-fetch": "^3.3.2"
+  }
+}
