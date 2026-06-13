@@ -1315,19 +1315,17 @@ async function callAI(userMsg) {
   c.scrollTop = c.scrollHeight;
 
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
+    const r = await fetch('/.netlify/functions/ai-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
         system: buildAIContext(),
-        messages: [{ role: 'user', content: userMsg }],
+        message: userMsg,
       }),
     });
     const data = await r.json();
     loading.innerHTML = '';
-    loading.textContent = data.content?.[0]?.text || 'Sin respuesta.';
+    loading.textContent = data.text || 'Sin respuesta.';
   } catch {
     loading.innerHTML = '';
     loading.textContent = '⚠️ Error de conexión.';
