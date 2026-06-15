@@ -398,13 +398,18 @@ body {
   gap: 8px;
 }
 
-.day-task-list li::before {
-  content: '';
+.day-task-list li .task-bullet {
   width: 4px; height: 4px;
   border-radius: 50%;
   background: var(--muted);
   flex-shrink: 0;
 }
+
+.day-task-list li .task-txt {
+  flex: 1;
+}
+
+
 
 /* TRACKER */
 .tracker-grid {
@@ -1057,8 +1062,8 @@ function renderWeek() {
     const tasks = state.routines[day] || [];
     const isToday = i === todayIdx;
     const taskHtml = tasks.length
-      ? tasks.map(t => `<li>${esc(t)}</li>`).join('')
-      : '<li style="color:var(--muted)">Día libre</li>';
+      ? tasks.map((t, ti) => `<li><span class="task-bullet"></span><span class="task-txt">${esc(t)}</span><button class="del-btn" style="font-size:14px;padding:0 4px" onclick="removeFromDay('${day}',${ti})">×</button></li>`).join('')
+      : '<li style="color:var(--muted)"><span class="task-bullet"></span><span class="task-txt">Día libre</span></li>';
     return `<div class="day-item ${isToday ? 'today' : ''}">
       <div class="day-header" onclick="toggleDay(this)">
         <div class="day-name-row">
@@ -1068,7 +1073,7 @@ function renderWeek() {
         </div>
         <span class="day-count">${tasks.length} tarea${tasks.length !== 1 ? 's' : ''}</span>
       </div>
-      <div class="day-body ${isToday ? 'open' : ''}">
+      <div class="day-body open">
         <ul class="day-task-list">${taskHtml}</ul>
         <div class="add-row" style="margin-top:0">
           <input class="inp" placeholder="Añadir a ${DAYS_ES[i]}..." onkeydown="if(event.key==='Enter')addToDay('${day}',this)">
@@ -1091,6 +1096,13 @@ function addToDay(dayKey, inp) {
   inp.value = '';
   renderWeek(); save();
   toast('Tarea añadida');
+}
+
+function removeFromDay(dayKey, idx) {
+  if (!state.routines[dayKey]) return;
+  state.routines[dayKey].splice(idx, 1);
+  renderWeek(); save();
+  toast('Tarea eliminada');
 }
 
 // ===== TRACKER =====
